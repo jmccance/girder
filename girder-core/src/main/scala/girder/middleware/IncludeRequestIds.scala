@@ -4,7 +4,7 @@ import cats.Functor
 import cats.data.Kleisli
 import org.http4s.{AttributeKey, Header, HttpService}
 
-object RequestIds {
+object IncludeRequestIds {
 
   val GirderRequestId: AttributeKey[String] = AttributeKey[String]
 

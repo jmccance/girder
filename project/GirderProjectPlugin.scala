@@ -14,6 +14,8 @@ object GirderProjectPlugin extends AutoPlugin {
         "-feature",
         "-language:higherKinds",
         "-Ypartial-unification",
-      )
+      ),
+
+      addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.6" cross CrossVersion.binary)
     )
 }
