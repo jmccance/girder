@@ -1,6 +1,6 @@
 package girder.middleware
 
-import cats.data.{Kleisli, OptionT}
+import cats.data.Kleisli
 import cats.effect.Sync
 import cats.syntax.applicative._
 import cats.syntax.flatMap._
@@ -16,15 +16,19 @@ object StandardizeErrors {
   def apply[F[_] : Sync](service: HttpService[F]): HttpService[F] =
     Kleisli { request =>
       service(request).semiflatMap { response =>
-        getDetails(response).flatMap { details =>
-          response.withBody(
-            ErrorResponse(
-              method = request.method.renderString,
-              path = request.pathInfo,
-              status = response.status.code,
-              details = Some(details)
-            ).asJson
-          )
+        if (response.status.isSuccess) {
+          response.pure
+        } else {
+          getDetails(response).flatMap { details =>
+            response.withBody(
+              ErrorResponse(
+                method = request.method.renderString,
+                path = request.pathInfo,
+                status = response.status.code,
+                details = Some(details)
+              ).asJson
+            )
+          }
         }
       }
     }
