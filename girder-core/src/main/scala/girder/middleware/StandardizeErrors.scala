@@ -1,6 +1,6 @@
 package girder.middleware
 
-import cats.data.Kleisli
+import cats.data.{Kleisli, OptionT}
 import cats.effect.Sync
 import cats.syntax.applicative._
 import cats.syntax.flatMap._
@@ -30,7 +30,7 @@ object StandardizeErrors {
     }
 
   private[this] def getDetails[F[_] : Sync](response: Response[F]): F[Json] = {
-    response.contentType.map {
+    response.contentType.collect {
       case `Content-Type`(MediaType.`application/json`, _) =>
         response.attemptAs[Json].fold(
           _ => Json.obj(),
@@ -42,9 +42,6 @@ object StandardizeErrors {
           _ => "".asJson,
           _.asJson
         )
-
-      case _ => Json.obj().pure
-
-    }.getOrElse(Json.obj().pure)
+    }.getOrElse(Json.obj("message" -> response.status.renderString.asJson).pure)
   }
 }
