@@ -8,7 +8,7 @@ import org.http4s.dsl.Http4sDsl
 
 class UserService[F[_] : Monad] extends Http4sDsl[F] {
   val service: HttpService[F] = HttpService[F] {
-    case GET -> Root / "users" / userId =>
+    case GET -> Root / userId =>
       NotFound(
         Map(
           "id" -> userId
